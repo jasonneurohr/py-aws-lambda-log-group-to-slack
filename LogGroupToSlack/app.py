@@ -24,13 +24,21 @@ def event_decoder(event):
 
 def send_notification(message, category):
     slack_uri = getenv("SLACK_WEBHOOK")
-    divider = (
-        "**************************************************************************\n"
+
+    # For reference - https://api.slack.com/docs/message-attachments
+    attachment = dict(
+        {
+            "attachments": [
+                {
+                    "title": f"CloudWatch Log Alarm: {category.upper()}",
+                    "text": message,
+                    "color": "danger",
+                }
+            ]
+        }
     )
 
-    category = f"{category.upper()} ALERT:\n"
-
-    req_data = json.dumps({"text": divider + category + message})
+    req_data = json.dumps(attachment)
 
     req_headers = {"Content-type": "application/json"}
     req = requests.post(url=slack_uri, headers=req_headers, data=req_data)
